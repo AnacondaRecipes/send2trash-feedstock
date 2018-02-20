@@ -1,6 +1,6 @@
 {% set name = "Send2Trash" %}
-{% set version = "1.4.2" %}
-{% set sha256 = "725fbce571dffe0b640e2f1788d52c3c544b510f9d8f69b2597c8c2555bc8441" %}
+{% set version = "1.5.0" %}
+{% set sha256 = "60001cc07d707fe247c94f74ca6ac0d3255aabcb930529690897ca2a39db28b2" %}
 
 package:
   name: {{ name|lower }}
