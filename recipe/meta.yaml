@@ -15,17 +15,25 @@ build:
   number: 1
   noarch: python
   script: python -m pip install --no-deps --ignore-installed .
+  entry_points:
+    - send2trash = send2trash.__main__:main
 
 requirements:
   host:
     - python
     - pip
+    - setuptools
+    - wheel
   run:
     - python
 
 test:
   imports:
     - send2trash
+  requires:
+    - pip
+  commands:
+    - pip check
   commands:
     - echo test > test.txt
     - python -c "from send2trash import *; send2trash('test.txt')"
@@ -36,6 +44,7 @@ about:
   license_family: BSD
   license_file: LICENSE
   summary: Python library to natively send files to Trash (or Recycle bin) on all platforms.
+  dev_url: https://github.com/arsenetar/send2trash
 
 extra:
   recipe-maintainers:
