@@ -34,11 +34,13 @@ test:
     - python -c "from send2trash import *; send2trash('test.txt')"
 
 about:
-  home: https://github.com/hsoft/send2trash
+  home: https://github.com/arsenetar/send2trash
   license: BSD-3-Clause
   license_family: BSD
   license_file: LICENSE
   summary: Python library to natively send files to Trash (or Recycle bin) on all platforms.
+  dev_url: https://github.com/arsenetar/send2trash
+  doc_url: https://github.com/arsenetar/send2trash/blob/master/README.rst
 
 extra:
   recipe-maintainers:
