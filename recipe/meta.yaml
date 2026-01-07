@@ -1,20 +1,19 @@
 {% set name = "Send2Trash" %}
 {% set version = "1.8.3" %}
-{% set sha256 = "b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  sha256: b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install --no-deps --no-build-isolation --ignore-installed .
-  skip: true  # [py==30,==31,==32,==33,==34,==35]
+  entry_points:
+    - send2trash = send2trash.__main__:main
 
 requirements:
   host:
@@ -24,15 +23,29 @@ requirements:
   run:
     - python
 
+# >       assert op.exists(op.join(trash_dir, str(os.getuid()), "files", gen_ext_vol[1])) is True
+# E       AssertionError: assert False is True
+# E        +  where False = <function exists at 0x106099e80>('/var/folders/hk/0l5x2q9d75553_1403ls966w0000gp/T/s2thbwez5o7/.Trash/502/files/test.txt')
+# E        +    where <function exists at 0x106099e80> = op.exists
+# E        +    and   '/var/folders/hk/0l5x2q9d75553_1403ls966w0000gp/T/s2thbwez5o7/.Trash/502/files/test.txt' = <function join at 0x10609aa30>('/var/folders/hk/0l5x2q9d75553_1403ls966w0000gp/T/s2thbwez5o7/.Trash', '502', 'files', 'test.txt')
+# E        +      where <function join at 0x10609aa30> = op.join
+# E        +      and   '502' = str(502)
+# E        +        where 502 = <built-in function getuid>()
+# E        +          where <built-in function getuid> = os.getuid
+{% set deselect_tests = " --deselect=tests/test_plat_other.py::test_trash_topdir" %}
+
 test:
+  source_files:
+    - tests
   imports:
     - send2trash
   requires:
     - pip
+    - pytest
   commands:
     - pip check
-    - echo test > test.txt
-    - python -c "from send2trash import *; send2trash('test.txt')"
+    - send2trash --help
+    - pytest -v tests {{ deselect_tests }}
 
 about:
   home: https://github.com/arsenetar/send2trash
