@@ -42,6 +42,7 @@ test:
   requires:
     - pip
     - pytest
+    - pywin32  # [win]
   commands:
     - pip check
     - send2trash --help
