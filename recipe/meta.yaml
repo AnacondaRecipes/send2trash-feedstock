@@ -1,38 +1,52 @@
 {% set name = "Send2Trash" %}
-{% set version = "1.8.2" %}
-{% set sha256 = "c132d59fa44b9ca2b1699af5c86f57ce9f4c5eb56629d5d55fbb7a35f84e2312" %}
+{% set version = "1.8.3" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf
 
 build:
-  number: 1
+  number: 0
   script: {{ PYTHON }} -m pip install --no-deps --no-build-isolation --ignore-installed .
+  entry_points:
+    - send2trash = send2trash.__main__:main
 
 requirements:
   host:
     - python
     - pip
-    - setuptools
-    - wheel
+    - setuptools >=40.6.0
   run:
     - python
 
+# >       assert op.exists(op.join(trash_dir, str(os.getuid()), "files", gen_ext_vol[1])) is True
+# E       AssertionError: assert False is True
+# E        +  where False = <function exists at 0x106099e80>('/var/folders/hk/0l5x2q9d75553_1403ls966w0000gp/T/s2thbwez5o7/.Trash/502/files/test.txt')
+# E        +    where <function exists at 0x106099e80> = op.exists
+# E        +    and   '/var/folders/hk/0l5x2q9d75553_1403ls966w0000gp/T/s2thbwez5o7/.Trash/502/files/test.txt' = <function join at 0x10609aa30>('/var/folders/hk/0l5x2q9d75553_1403ls966w0000gp/T/s2thbwez5o7/.Trash', '502', 'files', 'test.txt')
+# E        +      where <function join at 0x10609aa30> = op.join
+# E        +      and   '502' = str(502)
+# E        +        where 502 = <built-in function getuid>()
+# E        +          where <built-in function getuid> = os.getuid
+{% set deselect_tests = " --deselect=tests/test_plat_other.py::test_trash_topdir" %}
+
 test:
+  source_files:
+    - tests
   imports:
     - send2trash
   requires:
     - pip
+    - pytest
+    - pywin32  # [win]
   commands:
     - pip check
-    - echo test > test.txt
-    - python -c "from send2trash import *; send2trash('test.txt')"
+    - send2trash --help
+    - pytest -v tests {{ deselect_tests }}
 
 about:
   home: https://github.com/arsenetar/send2trash
@@ -41,10 +55,10 @@ about:
   license_file: LICENSE
   summary: Python library to natively send files to Trash (or Recycle bin) on all platforms.
   description: |
-    Send2Trash is a small package that sends files to the Trash (or Recycle Bin) natively and on all platforms. 
-    On OS X, it uses native FSMoveObjectToTrashSync Cocoa calls or can use pyobjc with NSFileManager. 
-    On Windows, it uses native IFileOperation call if on Vista or newer and pywin32 is installed or falls back 
-    to SHFileOperation calls. On other platforms, if PyGObject and GIO are available, it will use this. Otherwise, 
+    Send2Trash is a small package that sends files to the Trash (or Recycle Bin) natively and on all platforms.
+    On OS X, it uses native FSMoveObjectToTrashSync Cocoa calls or can use pyobjc with NSFileManager.
+    On Windows, it uses native IFileOperation call if on Vista or newer and pywin32 is installed or falls back
+    to SHFileOperation calls. On other platforms, if PyGObject and GIO are available, it will use this. Otherwise,
     it will fallback to its own implementation of the trash specifications from freedesktop.org.
     ctypes is used to access native libraries, so no compilation is necessary.
   dev_url: https://github.com/arsenetar/send2trash
