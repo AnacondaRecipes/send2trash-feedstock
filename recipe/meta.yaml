@@ -1,27 +1,6 @@
 {% set name = "Send2Trash" %}
-{% set version = "1.8.3" %}
-
-package:
-  name: {{ name|lower }}
-  version: {{ version }}
-
-source:
-  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: b18e7a3966d99871aefeb00cfbcfdced55ce4871194810fc71f4aa484b953abf
-
-build:
-  number: 0
-  script: {{ PYTHON }} -m pip install --no-deps --no-build-isolation --ignore-installed .
-  entry_points:
-    - send2trash = send2trash.__main__:main
-
-requirements:
-  host:
-    - python
-    - pip
-    - setuptools >=40.6.0
-  run:
-    - python
+{% set version = "2.1.0" %}
+{% set deselect_tests = " --deselect=tests/test_plat_other.py::test_trash_topdir" %}
 
 # >       assert op.exists(op.join(trash_dir, str(os.getuid()), "files", gen_ext_vol[1])) is True
 # E       AssertionError: assert False is True
@@ -32,7 +11,28 @@ requirements:
 # E        +      and   '502' = str(502)
 # E        +        where 502 = <built-in function getuid>()
 # E        +          where <built-in function getuid> = os.getuid
-{% set deselect_tests = " --deselect=tests/test_plat_other.py::test_trash_topdir" %}
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.org/packages/source/S/Send2Trash/send2trash-2.1.0.tar.gz
+  sha256: 1c72b39f09457db3c05ce1d19158c2cbef4c32b8bedd02c155e49282b7ea7459
+
+build:
+  number: 0
+  script: {{ PYTHON }} -m pip install --no-deps --no-build-isolation --ignore-installed .
+  entry_points:
+    - send2trash = send2trash.__main__:main
+  skip: true  # [py<38]
+
+requirements:
+  host:
+    - python
+    - pip
+    - setuptools >=75.3.1
+  run:
+    - python
 
 test:
   source_files:
